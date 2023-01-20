@@ -15,7 +15,7 @@ target_images = [[], [], []]
 targets = {1: [10, 5, 3],
            2: [12, 8, 5],
            3: [15, 12, 8, 3]}
-level = 3
+level = 1
 banner_top = HEIGHT - 200
 
 for level_index in range(1, 4):
@@ -32,7 +32,6 @@ for level_index in range(1, 4):
             target_images[level_index - 1].append(pygame.transform.scale(
                 pygame.image.load(f'assets/targets/{level_index}/{target_index}.png'),
                                     (120 - (target_index*18), 80 - (target_index*12))))
-
 
 def draw_gun():
     mouse_pos = pygame.mouse.get_pos()
@@ -58,6 +57,13 @@ def draw_gun():
             if clicks[0]:
                 pygame.draw.circle(screen, lasers[level -1], mouse_pos, 5)
 
+def draw_level(coordinates):
+    if level == 1 or level == 2:
+        target_rects = [[], [], []]
+    else:
+        target_rects = [[], [], [], []]
+    for i in range(len(coordinates)):
+        for j in range
 
 #main loop
 run = True
