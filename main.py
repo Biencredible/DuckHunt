@@ -11,6 +11,10 @@ screen = pygame.display.set_mode([WIDTH, HEIGHT])
 backgrounds = []
 banners = []
 guns = []
+target_images = [[], [], []]
+targets = {1: [10, 5, 3],
+           2: [12, 8, 5],
+           3: [15, 12, 8, 3]}
 level = 3
 banner_top = HEIGHT - 200
 
@@ -18,6 +22,17 @@ for level_index in range(1, 4):
     backgrounds.append(pygame.image.load(f'assets/bgs/{level_index}.png')) #f for formatted string because a variable is needed. Access variable with {level_index}
     banners.append(pygame.image.load(f'assets/banners/{level_index}.png'))
     guns.append(pygame.transform.scale(pygame.image.load(f'assets/guns/{level_index}.png'), (100, 100)))
+    if level_index < 3:
+        for target_index in range(1, 4):
+            target_images[level_index - 1].append(pygame.transform.scale(
+                pygame.image.load(f'assets/targets/{level_index}/{target_index}.png'),
+                                    (120 - (target_index*18), 80 - (target_index*12))))
+    else:
+        for target_index in range(1, 5):
+            target_images[level_index - 1].append(pygame.transform.scale(
+                pygame.image.load(f'assets/targets/{level_index}/{target_index}.png'),
+                                    (120 - (target_index*18), 80 - (target_index*12))))
+
 
 def draw_gun():
     mouse_pos = pygame.mouse.get_pos()
