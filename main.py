@@ -15,7 +15,7 @@ target_images = [[], [], []]
 targets = {1: [10, 5, 3],
            2: [12, 8, 5],
            3: [15, 12, 8, 3]}
-level = 1
+level = 3
 banner_top = HEIGHT - 200
 
 for level_index in range(1, 4):
@@ -57,13 +57,41 @@ def draw_gun():
             if clicks[0]:
                 pygame.draw.circle(screen, lasers[level -1], mouse_pos, 5)
 
+
 def draw_level(coordinates):
     if level == 1 or level == 2:
         target_rects = [[], [], []]
     else:
         target_rects = [[], [], [], []]
-    for i in range(len(coordinates)):
-        for j in range
+    for tier_index in range(len(coordinates)):
+        for start_position_index in range(len(coordinates[tier_index])):
+            target_rects[tier_index].append(pygame.rect.Rect((coordinates[tier_index][start_position_index][0] + 20,
+                                                              coordinates[tier_index][start_position_index][1]),
+                                                              (60 - tier_index * 12, 60 - tier_index * 12)))
+            screen.blit(target_images[level - 1][tier_index], coordinates[tier_index][start_position_index])
+    return target_rects
+
+
+#initialize enemy coordinates
+one_coordinates = [[], [], []]
+two_coordinates = [[], [], []]
+three_coordinates = [[], [], [], []]
+for tier_index in range(3):
+    temporary_target_list = targets[1]
+    for start_position_index in range(temporary_target_list[tier_index]):
+        one_coordinates[tier_index].append((WIDTH//(temporary_target_list[tier_index]) * start_position_index, #// -> floor devision
+                                            300 - (tier_index * 150) + 30 * (start_position_index % 2))) # alternate in adding 30
+for tier_index in range(3):
+    temporary_target_list = targets[2]
+    for start_position_index in range(temporary_target_list[tier_index]):
+        two_coordinates[tier_index].append((WIDTH//(temporary_target_list[tier_index]) * start_position_index, #// -> floor devision
+                                            300 - (tier_index * 150) + 30 * (start_position_index % 2))) # alternate in adding 30
+for tier_index in range(4):
+    temporary_target_list = targets[3]
+    for start_position_index in range(temporary_target_list[tier_index]):
+        three_coordinates[tier_index].append((WIDTH // (temporary_target_list[tier_index]) * start_position_index,  # // -> floor devision
+                                            300 - (tier_index * 100) + 30 * (start_position_index % 2)))  # alternate in adding 30
+
 
 #main loop
 run = True
@@ -73,6 +101,13 @@ while run:
     screen.fill('black')
     screen.blit(backgrounds[level - 1], (0, 0))
     screen.blit(banners[level - 1], (0, banner_top))
+
+    if level == 1:
+        target_boxes = draw_level(one_coordinates)
+    elif level == 2:
+        target_boxes = draw_level(two_coordinates)
+    elif level == 3:
+        target_boxes = draw_level(three_coordinates)
 
     if level > 0:
         draw_gun()
