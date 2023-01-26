@@ -58,6 +58,22 @@ def draw_gun():
                 pygame.draw.circle(screen, lasers[level -1], mouse_pos, 5)
 
 
+def move_level(coordinates):
+    if level == 1 or level == 2:
+        max_tier = 3
+    else:
+        max_tier = 4
+    for tier_index in range(max_tier):
+        for start_position_index in range(len(coordinates[tier_index])):
+            temporary_coords = coordinates[tier_index][start_position_index]
+            if temporary_coords[0] < -150:
+                coordinates[tier_index][start_position_index] = WIDTH, temporary_coords[1]
+            else:
+                coordinates[tier_index][start_position_index] = (temporary_coords[0] - 2**tier_index, temporary_coords[1])
+    return coordinates
+
+
+
 def draw_level(coordinates):
     if level == 1 or level == 2:
         target_rects = [[], [], []]
@@ -104,10 +120,13 @@ while run:
 
     if level == 1:
         target_boxes = draw_level(one_coordinates)
+        one_coordinates = move_level(one_coordinates)
     elif level == 2:
         target_boxes = draw_level(two_coordinates)
+        two_coordinates= move_level(two_coordinates)
     elif level == 3:
         target_boxes = draw_level(three_coordinates)
+        three_coordinates = move_level(three_coordinates)
 
     if level > 0:
         draw_gun()
