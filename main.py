@@ -15,7 +15,7 @@ target_images = [[], [], []]
 targets = {1: [10, 5, 3],
            2: [12, 8, 5],
            3: [15, 12, 8, 3]}
-level = 3
+level = 1
 points = 0
 total_shots = 0
 mode = 0
@@ -168,6 +168,10 @@ while run:
                 total_shots += 1
                 if mode == 1:
                     ammo -= 1
+
+    if level > 0:
+        if target_boxes == [[], [], []] and level < 3:
+            level += 1
 
     pygame.display.flip()
 
