@@ -16,22 +16,29 @@ targets = {1: [10, 5, 3],
            2: [12, 8, 5],
            3: [15, 12, 8, 3]}
 level = 3
+points = 0
+total_shots = 0
+mode = 0
+# 0 = freeplay, 1 = accuracy, 2 = timed
+ammo = 0
+shot = False
 banner_top = HEIGHT - 200
 
 for level_index in range(1, 4):
-    backgrounds.append(pygame.image.load(f'assets/bgs/{level_index}.png')) #f for formatted string because a variable is needed. Access variable with {level_index}
+    # f for formatted string because a variable is needed. Access variable with {level_index}
+    backgrounds.append(pygame.image.load(f'assets/bgs/{level_index}.png'))
     banners.append(pygame.image.load(f'assets/banners/{level_index}.png'))
     guns.append(pygame.transform.scale(pygame.image.load(f'assets/guns/{level_index}.png'), (100, 100)))
     if level_index < 3:
         for target_index in range(1, 4):
             target_images[level_index - 1].append(pygame.transform.scale(
                 pygame.image.load(f'assets/targets/{level_index}/{target_index}.png'),
-                                    (120 - (target_index*18), 80 - (target_index*12))))
+                                  (120 - (target_index*18), 80 - (target_index*12))))
     else:
         for target_index in range(1, 5):
             target_images[level_index - 1].append(pygame.transform.scale(
                 pygame.image.load(f'assets/targets/{level_index}/{target_index}.png'),
-                                    (120 - (target_index*18), 80 - (target_index*12))))
+                                  (120 - (target_index*18), 80 - (target_index*12))))
 
 def draw_gun():
     mouse_pos = pygame.mouse.get_pos()
@@ -73,7 +80,6 @@ def move_level(coordinates):
     return coordinates
 
 
-
 def draw_level(coordinates):
     if level == 1 or level == 2:
         target_rects = [[], [], []]
@@ -86,6 +92,18 @@ def draw_level(coordinates):
                                                               (60 - tier_index * 12, 60 - tier_index * 12)))
             screen.blit(target_images[level - 1][tier_index], coordinates[tier_index][start_position_index])
     return target_rects
+
+
+def check_shot(targets, coordinates):
+    global points
+    mouse_pos = pygame.mouse.get_pos()
+    for tier_index in range(len(targets)):
+        for target_index in range(len(targets[tier_index])):
+            if targets[tier_index][target_index].collidepoint(mouse_pos):
+                coordinates[tier_index].pop(target_index)
+                points += 10 + 10 * (tier_index**2)
+                # add sounds for enemy hit
+    return coordinates
 
 
 #initialize enemy coordinates
@@ -121,12 +139,21 @@ while run:
     if level == 1:
         target_boxes = draw_level(one_coordinates)
         one_coordinates = move_level(one_coordinates)
+        if shot:
+            one_coordinates = check_shot(target_boxes, one_coordinates)
+            shot = False
     elif level == 2:
         target_boxes = draw_level(two_coordinates)
-        two_coordinates= move_level(two_coordinates)
+        two_coordinates = move_level(two_coordinates)
+        if shot:
+            two_coordinates = check_shot(target_boxes, two_coordinates)
+            shot = False
     elif level == 3:
         target_boxes = draw_level(three_coordinates)
         three_coordinates = move_level(three_coordinates)
+        if shot:
+            three_coordinates = check_shot(target_boxes, three_coordinates)
+            shot = False
 
     if level > 0:
         draw_gun()
@@ -134,6 +161,13 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            mouse_position = pygame.mouse.get_pos()
+            if(0 < mouse_position[0] < WIDTH) and (0 < mouse_position[1] < HEIGHT):
+                shot = True
+                total_shots += 1
+                if mode == 1:
+                    ammo -= 1
 
     pygame.display.flip()
 
