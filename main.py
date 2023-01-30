@@ -21,6 +21,9 @@ total_shots = 0
 mode = 0
 # 0 = freeplay, 1 = accuracy, 2 = timed
 ammo = 0
+time_passed = 0
+time_remaining = 0
+counter = 1
 shot = False
 banner_top = HEIGHT - 200
 
@@ -39,6 +42,23 @@ for level_index in range(1, 4):
             target_images[level_index - 1].append(pygame.transform.scale(
                 pygame.image.load(f'assets/targets/{level_index}/{target_index}.png'),
                                   (120 - (target_index*18), 80 - (target_index*12))))
+
+
+def draw_score():
+    points_text = font.render(f'Points: {points}', True, 'black')
+    screen.blit(points_text, (320, 660))
+    shots_text = font.render(f'Total Shots: {total_shots}', True, 'black')
+    screen.blit(shots_text, (320, 687))
+    time_text = font.render(f'Time Elapsed: {time_passed}', True, 'black')
+    screen.blit(time_text, (320, 714))
+    if mode == 0:
+        mode_text = font.render(f'Freeplay!', True, 'black')
+    elif mode == 1:
+        mode_text = font.render(f'Ammo Remaing: {ammo}', True, 'black')
+    if mode == 2:
+        mode_text = font.render(f'Time Remaining: {time_remaining}', True, 'black')
+    screen.blit(mode_text, (320, 741))
+
 
 def draw_gun():
     mouse_pos = pygame.mouse.get_pos()
@@ -131,6 +151,15 @@ for tier_index in range(4):
 run = True
 while run:
     timer.tick(fps)
+    if level != 0:
+        if counter < 60:
+            counter += 1
+        else:
+            counter = 1
+            time_passed += 1
+            if mode == 2:
+                time_remaining -= 1
+
 
     screen.fill('black')
     screen.blit(backgrounds[level - 1], (0, 0))
@@ -157,13 +186,14 @@ while run:
 
     if level > 0:
         draw_gun()
+        draw_score()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             mouse_position = pygame.mouse.get_pos()
-            if(0 < mouse_position[0] < WIDTH) and (0 < mouse_position[1] < HEIGHT):
+            if(0 < mouse_position[0] < WIDTH) and (0 < mouse_position[1] < banner_top):
                 shot = True
                 total_shots += 1
                 if mode == 1:
