@@ -33,7 +33,7 @@ game_over = False
 pause = False
 clicked = False
 write_values = False
-new_coords = False
+new_coords = True
 banner_top = HEIGHT - 200
 menu_img = pygame.image.load(f'assets/menus/mainMenu.png')
 game_over_img = pygame.image.load(f'assets/menus/gameOver.png')
@@ -141,7 +141,7 @@ def check_shot(targets, coordinates):
 
 def draw_menu():
     global game_over, pause, mode, level, menu, time_passed, total_shots, points, ammo, time_remaining
-    global best_freeplay, best_ammo, best_time, write_values, clicked
+    global best_freeplay, best_ammo, best_time, write_values, clicked, new_coords
     game_over = False
     pause = False
     screen.blit(menu_img, (0, 0))
@@ -162,6 +162,7 @@ def draw_menu():
         total_shots = 0
         points = 0
         clicked = True
+        new_coords = True
     if ammo_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
         mode = 1
         level = 1
@@ -171,6 +172,7 @@ def draw_menu():
         points = 0
         ammo = 81
         clicked = True
+        new_coords = True
     if timed_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
         mode = 2
         level = 1
@@ -180,26 +182,21 @@ def draw_menu():
         points = 0
         time_remaining = 30
         clicked = True
+        new_coords = True
     if reset_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
-        mode = 2
-        level = 1
-        menu = False
-        time_passed = 0
-        total_shots = 0
-        points = 0
-        time_remaining = 30
         best_freeplay = 0
         best_ammo = 0
         best_time = 0
-        write_values = True
         clicked = True
+        write_values = True
+
 
 def draw_game_over():
     pass
 
 
 def draw_pause():
-    global level, pause, menu, points, total_shots, total_shots, time_passed, time_remaining, clicked
+    global level, pause, menu, points, total_shots, total_shots, time_passed, time_remaining, clicked, new_coords
     screen.blit(pause_img, (0,0))
     mouse_pos = pygame.mouse.get_pos()
     clicks = pygame.mouse.get_pressed()
@@ -217,27 +214,29 @@ def draw_pause():
         time_passed = 0
         time_remaining = 0
         clicked = True
+        new_coords = True
 
 
-#initialize enemy coordinates
-one_coordinates = [[], [], []]
-two_coordinates = [[], [], []]
-three_coordinates = [[], [], [], []]
-for tier_index in range(3):
-    temporary_target_list = targets[1]
-    for start_position_index in range(temporary_target_list[tier_index]):
-        one_coordinates[tier_index].append((WIDTH//(temporary_target_list[tier_index]) * start_position_index, #// -> floor devision
-                                            300 - (tier_index * 150) + 30 * (start_position_index % 2))) # alternate in adding 30
-for tier_index in range(3):
-    temporary_target_list = targets[2]
-    for start_position_index in range(temporary_target_list[tier_index]):
-        two_coordinates[tier_index].append((WIDTH//(temporary_target_list[tier_index]) * start_position_index, #// -> floor devision
-                                            300 - (tier_index * 150) + 30 * (start_position_index % 2))) # alternate in adding 30
-for tier_index in range(4):
-    temporary_target_list = targets[3]
-    for start_position_index in range(temporary_target_list[tier_index]):
-        three_coordinates[tier_index].append((WIDTH // (temporary_target_list[tier_index]) * start_position_index,  # // -> floor devision
-                                            300 - (tier_index * 100) + 30 * (start_position_index % 2)))  # alternate in adding 30
+def initialize_enemy_coordinates():
+    global one_coordinates, two_coordinates, three_coordinates
+    one_coordinates = [[], [], []]
+    two_coordinates = [[], [], []]
+    three_coordinates = [[], [], [], []]
+    for tier_index in range(3):
+        temporary_target_list = targets[1]
+        for start_position_index in range(temporary_target_list[tier_index]):
+            one_coordinates[tier_index].append((WIDTH//(temporary_target_list[tier_index]) * start_position_index, #// -> floor devision
+                                                300 - (tier_index * 150) + 30 * (start_position_index % 2))) # alternate in adding 30
+    for tier_index in range(3):
+        temporary_target_list = targets[2]
+        for start_position_index in range(temporary_target_list[tier_index]):
+            two_coordinates[tier_index].append((WIDTH//(temporary_target_list[tier_index]) * start_position_index, #// -> floor devision
+                                                300 - (tier_index * 150) + 30 * (start_position_index % 2))) # alternate in adding 30
+    for tier_index in range(4):
+        temporary_target_list = targets[3]
+        for start_position_index in range(temporary_target_list[tier_index]):
+            three_coordinates[tier_index].append((WIDTH // (temporary_target_list[tier_index]) * start_position_index,  # // -> floor devision
+                                                300 - (tier_index * 100) + 30 * (start_position_index % 2)))  # alternate in adding 30
 
 
 #main loop
@@ -253,8 +252,9 @@ while run:
             if mode == 2:
                 time_remaining -= 1
 
-    if level == 1 and not new_coords:
-
+    if new_coords:
+        initialize_enemy_coordinates()
+        new_coords = False
 
     screen.fill('black')
     screen.blit(backgrounds[level - 1], (0, 0))
@@ -310,6 +310,7 @@ while run:
             if (670 < mouse_position[0] < 860) and (715 < mouse_position[1] < 760):
                 menu = True
                 clicked = True
+                new_coords = True
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1 and clicked:
             clicked = False
 
