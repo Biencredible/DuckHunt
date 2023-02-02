@@ -58,6 +58,14 @@ for level_index in range(1, 4):
                                   (120 - (target_index*18), 80 - (target_index*12))))
 
 
+file = open('high_scores.txt', 'r')
+read_file = file.readlines()
+file.close()
+best_freeplay = int(read_file[0])
+best_ammo = int(read_file[1])
+best_time = int(read_file[2])
+
+
 def draw_score():
     points_text = font.render(f'Points: {points}', True, 'black')
     screen.blit(points_text, (320, 660))
@@ -355,6 +363,9 @@ while run:
                     best_time = points
                     write_values = True
             game_over = True
+    if write_values:
+        file = open('high_scores.txt', 'w')
+        file.write(f'{best_freeplay}\n{best_ammo}\n{best_time}')
 
     pygame.display.flip()
 
