@@ -5,6 +5,7 @@ pygame.init()
 fps = 60
 timer = pygame.time.Clock()
 font = pygame.font.Font('assets/font/myFont.ttf', 32)
+big_font = pygame.font.Font('assets/font/myFont.ttf', 60)
 WIDTH = 900
 HEIGHT = 800
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
@@ -192,7 +193,29 @@ def draw_menu():
 
 
 def draw_game_over():
-    pass
+    global level, pause, menu, points, total_shots, total_shots, time_passed, time_remaining, clicked
+    if mode == 0:
+        display_score = time_passed
+    else:
+        display_score = points
+    screen.blit(game_over_img, (0, 0))
+    mouse_pos = pygame.mouse.get_pos()
+    clicks = pygame.mouse.get_pressed()
+    exit_button = pygame.rect.Rect((170, 661), (260, 100))
+    menu_button = pygame.rect.Rect((475, 661), (260, 100))
+    screen.blit(big_font.render(f'{display_score}', True, 'black'), (650, 570))
+    if menu_button.collidepoint(mouse_pos) and clicks [0] and not clicked:
+        level = 0
+        pause = False
+        menu = True
+        points = 0
+        total_shots = 0
+        time_passed = 0
+        time_remaining = 0
+        clicked = True
+    if exit_button.collidepoint(mouse_pos) and clicks [0] and not clicked:
+        global run
+        run = False
 
 
 def draw_pause():
@@ -317,6 +340,21 @@ while run:
     if level > 0:
         if target_boxes == [[], [], []] and level < 3:
             level += 1
+        if (level == 3 and target_boxes == [[], [], [], []]) or (mode == 1 and ammo == 0) or (mode == 2 and time_remaining == 0):
+            new_coords = True
+            if mode == 0:
+                if time_passed < best_freeplay or best_freeplay == 0:
+                    best_freeplay = time_passed
+                    write_values = True
+            if mode == 1:
+                if points > best_ammo:
+                    best_ammo = points
+                    write_values = True
+            if mode == 2:
+                if points > best_time:
+                    best_time = points
+                    write_values = True
+            game_over = True
 
     pygame.display.flip()
 
